@@ -2,13 +2,9 @@
  * NeuGlow Store — Backend Server
  *
  * All sensitive config (Stripe keys, SMTP, JWT secret) is stored in MongoDB.
- * The ONLY file not committed to git is mongo-uri.json (gitignored).
- * Everything else lives in the database.
- *
- * First time setup:
- *   1. Create mongo-uri.json: { "uri": "mongodb+srv://..." }
- *   2. node server.js
- *   3. Visit http://localhost:3000/setup  ← admin-only setup wizard
+ * Bootstrap URI comes from:
+ *   - Production: MONGO_URI environment variable (Render)
+ *   - Local dev:  mongo-uri.json (gitignored)
  */
 
 const express  = require('express');
@@ -19,31 +15,33 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(__dirname)); // serve HTML files from root
+app.use(express.static(__dirname));
 
-// ── Bootstrap ─────────────────────────────────────────────────────────────────
 const { connectDB, loadConfig } = require('./config/db');
 
 async function start() {
-  // Read the bootstrap Mongo URI from mongo-uri.json (gitignored)
-  let bootstrapURI;
-  try {
-    const fs = require('fs');
-    const data = fs.readFileSync(path.join(__dirname, 'mongo-uri.json'), 'utf8');
-    bootstrapURI = JSON.parse(data).uri;
-  } catch {
-    console.error('\n⚠  mongo-uri.json not found or invalid.');
-    console.error('   Create it: { "uri": "mongodb+srv://user:pass@cluster/neuglow" }');
-    console.error('   This file is gitignored and must be created manually on each server.\n');
-    process.exit(1);
+  // 1. Try environment variable first (Render/production)
+  // 2. Fall back to mongo-uri.json (local dev)
+  let bootstrapURI = process.env.MONGO_URI;
+
+  if (!bootstrapURI) {
+    try {
+      const fs   = require('fs');
+      const data = fs.readFileSync(path.join(__dirname, 'mongo-uri.json'), 'utf8');
+      bootstrapURI = JSON.parse(data).uri;
+    } catch {
+      console.error('\n⚠  No MONGO_URI environment variable and no mongo-uri.json found.');
+      console.error('   Local dev: create mongo-uri.json with { "uri": "mongodb+srv://..." }');
+      console.error('   Production: set MONGO_URI environment variable in Render dashboard\n');
+      process.exit(1);
+    }
   }
 
   await connectDB(bootstrapURI);
 
-  // Load store config from DB and attach to app
   app.locals.cfg = await loadConfig();
 
-  // ── Mount routes ─────────────────────────────────────────────────────────
+  // ── Routes ────────────────────────────────────────────────────────────────
   app.use('/api/auth',     require('./routes/auth'));
   app.use('/api/products', require('./routes/products'));
   app.use('/api/orders',   require('./routes/orders'));
