@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — NeuGlow</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: #F5F0E8; font-size: 14px; }
+    .admin-layout { display: flex; min-height: 100vh; }
+    .sidebar { width: 240px; background: var(--dark); flex-shrink: 0; display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0; z-index: 100; padding: 28px 0 20px; }
+    .sidebar-logo { padding: 0 24px 28px; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 16px; }
+    .sidebar-logo a { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--cream); }
+    .sidebar-logo a span { color: var(--orange); }
+    .sidebar-logo small { display: block; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.3); margin-top: 2px; }
+    .nav-group-label { padding: 10px 24px 6px; font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.25); }
+    .sidebar-nav { list-style: none; flex: 1; }
+    .sidebar-nav li a { display: flex; align-items: center; gap: 12px; padding: 11px 24px; color: rgba(255,255,255,0.55); font-size: 13px; font-weight: 500; transition: var(--transition); border-left: 3px solid transparent; }
+    .sidebar-nav li a:hover { color: var(--cream); background: rgba(255,255,255,0.04); }
+    .sidebar-nav li a.active { color: var(--orange); border-left-color: var(--orange); background: rgba(232,82,10,0.08); }
+    .sidebar-nav .ico { font-size: 16px; width: 20px; text-align: center; }
+    .sidebar-footer { padding: 16px 24px; border-top: 1px solid rgba(255,255,255,0.06); }
+    .sidebar-footer a { color: rgba(255,255,255,0.35); font-size: 12px; display: block; margin-bottom: 6px; transition: var(--transition); }
+    .sidebar-footer a:hover { color: var(--orange); }
+    .admin-main { margin-left: 240px; flex: 1; min-height: 100vh; }
+    .admin-topbar { background: white; border-bottom: 1px solid var(--border); padding: 0 32px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+    .topbar-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 600; }
+    .topbar-user { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--warm-gray); }
+    .admin-page { display: none; padding: 32px; }
+    .admin-page.active { display: block; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px; }
+    .stat-card { background: white; border-radius: var(--r-md); padding: 22px; border: 1px solid var(--border); }
+    .stat-card .label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--warm-gray); margin-bottom: 8px; }
+    .stat-card .value { font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: var(--dark); }
+    .stat-card.orange .value { color: var(--orange); }
+    .table-card { background: white; border-radius: var(--r-md); border: 1px solid var(--border); overflow: hidden; }
+    .table-header { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .table-header h3 { font-family: var(--font-display); font-size: 1.1rem; margin: 0; }
+    .table-header-actions { display: flex; gap: 8px; align-items: center; }
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th { background: #FAFAFA; text-align: left; padding: 12px 18px; font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--warm-gray); border-bottom: 1px solid var(--border); }
+    .data-table td { padding: 14px 18px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .data-table tr:last-child td { border: none; }
+    .data-table tr:hover td { background: #FAFAF8; }
+    .action-btns { display: flex; gap: 8px; }
+    .btn-icon { width: 32px; height: 32px; border-radius: var(--r-sm); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; transition: var(--transition); background: none; color: var(--warm-gray); }
+    .btn-icon:hover { border-color: var(--orange); color: var(--orange); }
+    .btn-icon.danger:hover { border-color: #C44208; color: #C44208; }
+    .pill { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .pill-green  { background: #D1FAE5; color: #065F46; }
+    .pill-yellow { background: #FEF3C7; color: #92400E; }
+    .pill-blue   { background: #DBEAFE; color: #1E40AF; }
+    .pill-red    { background: #FEE2E2; color: #991B1B; }
+    .pill-gray   { background: #F3F4F6; color: #6B7280; }
+    .product-form .form-row { grid-template-columns: 1fr 1fr; }
+    .stock-cell { display: flex; align-items: center; gap: 8px; }
+    .stock-input { width: 70px; padding: 6px 10px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 13px; text-align: center; }
+    .stock-input:focus { outline: none; border-color: var(--orange); }
+    .config-section { background: white; border-radius: var(--r-md); border: 1px solid var(--border); padding: 26px; margin-bottom: 24px; }
+    .config-section h3 { font-family: var(--font-display); font-size: 1.1rem; margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+    .config-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .alert { padding: 14px 18px; border-radius: var(--r-sm); margin-bottom: 20px; font-size: 13px; display: flex; align-items: center; gap: 10px; }
+    .alert-warning { background: #FEF3C7; border: 1px solid #FDE68A; color: #92400E; }
+    .search-bar { display: flex; gap: 12px; margin-bottom: 20px; }
+    .search-bar input { flex: 1; padding: 9px 14px; border: 1.5px solid var(--border); border-radius: var(--r-sm); font-size: 13px; }
+    .search-bar input:focus { outline: none; border-color: var(--orange); }
+    .btn-danger { background: #FEE2E2; color: #991B1B; border: 1.5px solid #FECACA; cursor: pointer; padding: 8px 16px; border-radius: var(--r-sm); font-size: 13px; font-weight: 600; transition: var(--transition); }
+    .btn-danger:hover { background: #991B1B; color: white; }
+
+    /* Image upload */
+    .img-upload-zone {
+      border: 2px dashed var(--border); border-radius: var(--r-md);
+      padding: 24px; text-align: center; cursor: pointer;
+      transition: all .2s; background: #FAFAF8; margin-bottom: 12px;
+    }
+    .img-upload-zone:hover, .img-upload-zone.drag-over { border-color: var(--orange); background: rgba(232,82,10,0.04); }
+    .img-upload-zone .ico { font-size: 2rem; margin-bottom: 8px; }
+    .img-upload-zone p { font-size: 13px; color: var(--warm-gray); margin: 0; }
+    .img-upload-zone strong { color: var(--orange); }
+    .img-previews { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+    .img-preview { position: relative; width: 80px; height: 80px; border-radius: var(--r-sm); overflow: hidden; border: 1.5px solid var(--border); }
+    .img-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .img-preview .remove-img { position: absolute; top: 2px; right: 2px; width: 20px; height: 20px; background: rgba(0,0,0,0.6); color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+    .img-uploading { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--orange); }
+    .spinner { width: 14px; height: 14px; border: 2px solid rgba(232,82,10,0.2); border-top-color: var(--orange); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 1024px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 768px) { .sidebar { transform: translateX(-100%); transition: var(--transition); } .sidebar.open { transform: translateX(0); } .admin-main { margin-left: 0; } }
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <a href="/">Neu<span>Glow</span></a>
+      <small>Admin Panel</small>
+    </div>
+    <div class="nav-group-label">Overview</div>
+    <ul class="sidebar-nav">
+      <li><a href="#" onclick="showPage('dashboard')" class="active" id="nav-dashboard"><span class="ico">📊</span> Dashboard</a></li>
+    </ul>
+    <div class="nav-group-label">Store</div>
+    <ul class="sidebar-nav">
+      <li><a href="#" onclick="showPage('products')" id="nav-products"><span class="ico">💡</span> Products</a></li>
+      <li><a href="#" onclick="showPage('inventory')" id="nav-inventory"><span class="ico">📦</span> Inventory</a></li>
+      <li><a href="#" onclick="showPage('orders')" id="nav-orders"><span class="ico">🧾</span> Orders</a></li>
+    </ul>
+    <div class="nav-group-label">Admin</div>
+    <ul class="sidebar-nav">
+      <li><a href="#" onclick="showPage('users')" id="nav-users"><span class="ico">👥</span> Users</a></li>
+      <li><a href="#" onclick="showPage('config')" id="nav-config"><span class="ico">⚙️</span> Config</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a href="/" target="_blank">← View Store</a>
+      <a href="#" onclick="adminLogout()">Sign Out</a>
+    </div>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <span class="topbar-title" id="page-title">Dashboard</span>
+      <div class="topbar-user">
+        <span id="admin-name">Admin</span>
+        <span style="color:var(--border)">|</span>
+        <a href="/" style="color:var(--orange);font-size:12px">Visit Store →</a>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="admin-page active" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card orange"><div class="label">Total Revenue</div><div class="value" id="s-rev">—</div></div>
+        <div class="stat-card"><div class="label">Total Orders</div><div class="value" id="s-ord">—</div></div>
+        <div class="stat-card"><div class="label">Customers</div><div class="value" id="s-usr">—</div></div>
+        <div class="stat-card"><div class="label">Active Products</div><div class="value" id="s-prd">—</div></div>
+      </div>
+      <div id="low-stock-alert"></div>
+      <div class="table-card">
+        <div class="table-header"><h3>Recent Orders</h3><button class="btn btn-secondary btn-sm" onclick="showPage('orders')">View All</button></div>
+        <div id="recent-orders-table"></div>
+      </div>
+    </div>
+
+    <!-- Products -->
+    <div class="admin-page" id="page-products">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:20px">
+        <button class="btn btn-primary" onclick="openProductModal()">+ Add Product</button>
+      </div>
+      <div class="table-card">
+        <div class="table-header"><h3>All Products</h3></div>
+        <div id="products-table"></div>
+      </div>
+    </div>
+
+    <!-- Inventory -->
+    <div class="admin-page" id="page-inventory">
+      <div id="inventory-alerts" style="margin-bottom:16px"></div>
+      <div class="table-card">
+        <div class="table-header">
+          <h3>Stock Management</h3>
+          <span style="font-size:12px;color:var(--warm-gray)">Edit stock directly in the table below</span>
+        </div>
+        <div id="inventory-table"></div>
+      </div>
+    </div>
+
+    <!-- Orders -->
+    <div class="admin-page" id="page-orders">
+      <div class="search-bar">
+        <input id="order-status-filter" placeholder="Filter by status or order number…" oninput="filterOrders()">
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <h3>All Orders</h3>
+          <div class="table-header-actions">
+            <span id="order-count" style="font-size:12px;color:var(--warm-gray)"></span>
+            <button class="btn-danger" onclick="clearAllOrders()">🗑️ Clear All Orders</button>
+          </div>
+        </div>
+        <div id="orders-table"></div>
+      </div>
+    </div>
+
+    <!-- Users -->
+    <div class="admin-page" id="page-users">
+      <div class="table-card">
+        <div class="table-header"><h3>Customers &amp; Admins</h3></div>
+        <div id="users-table"></div>
+      </div>
+    </div>
+
+    <!-- Config -->
+    <div class="admin-page" id="page-config">
+      <p style="color:var(--warm-gray);margin-bottom:24px;font-size:13px">⚠️ All credentials are saved to MongoDB — never to files or environment variables.</p>
+      <div class="config-section">
+        <h3>🔑 Authentication</h3>
+        <div class="config-row">
+          <div class="form-group"><label>JWT Secret Key</label><input class="form-control" id="cfg-jwtSecret" type="password" placeholder="Long random string"></div>
+          <div class="form-group"><label>Token Expiry</label><input class="form-control" id="cfg-jwtExpiry" placeholder="7d"></div>
+        </div>
+      </div>
+      <div class="config-section">
+        <h3>💳 Stripe Payments</h3>
+        <div class="config-row">
+          <div class="form-group"><label>Publishable Key</label><input class="form-control" id="cfg-stripePublishableKey" placeholder="pk_live_…"></div>
+          <div class="form-group"><label>Secret Key</label><input class="form-control" id="cfg-stripeSecretKey" type="password" placeholder="sk_live_…"></div>
+        </div>
+      </div>
+      <div class="config-section">
+        <h3>🖼️ Cloudinary (Image Uploads)</h3>
+        <div class="config-row">
+          <div class="form-group"><label>Cloud Name</label><input class="form-control" id="cfg-cloudinaryCloud" placeholder="dpqog9kdb"></div>
+          <div class="form-group"><label>Upload Preset <span style="font-weight:400;text-transform:none;font-size:11px">(unsigned)</span></label><input class="form-control" id="cfg-cloudinaryPreset" placeholder="neuglow_products"></div>
+        </div>
+        <p style="font-size:12px;color:var(--warm-gray);margin-top:8px">
+          Create an <strong>unsigned upload preset</strong> at cloudinary.com → Settings → Upload → Upload Presets → Add preset → Set to Unsigned. Name it anything (e.g. <code>neuglow_products</code>).
+        </p>
+      </div>
+      <div class="config-section">
+        <h3>📧 Email (SMTP)</h3>
+        <div class="config-row">
+          <div class="form-group"><label>SMTP Host</label><input class="form-control" id="cfg-smtpHost" placeholder="smtp.gmail.com"></div>
+          <div class="form-group"><label>Port</label><input class="form-control" id="cfg-smtpPort" placeholder="587"></div>
+        </div>
+        <div class="config-row">
+          <div class="form-group"><label>Username / Email</label><input class="form-control" id="cfg-smtpUser" placeholder="store@email.com"></div>
+          <div class="form-group"><label>Password</label><input class="form-control" id="cfg-smtpPass" type="password" placeholder="App password"></div>
+        </div>
+        <div class="form-group"><label>From Address</label><input class="form-control" id="cfg-smtpFrom" placeholder="hello@neuglow.com"></div>
+      </div>
+      <div class="config-section">
+        <h3>🏪 Store Settings</h3>
+        <div class="config-row">
+          <div class="form-group"><label>Store Name</label><input class="form-control" id="cfg-storeName" placeholder="NeuGlow"></div>
+          <div class="form-group"><label>Support Email</label><input class="form-control" id="cfg-supportEmail" placeholder="support@neuglow.com"></div>
+        </div>
+        <div class="form-group"><label>Currency</label>
+          <select class="form-control" id="cfg-currency">
+            <option value="USD">USD — US Dollar</option>
+            <option value="EUR">EUR — Euro</option>
+            <option value="GBP">GBP — British Pound</option>
+            <option value="KES">KES — Kenyan Shilling</option>
+            <option value="TWD">TWD — Taiwan Dollar</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <button class="btn btn-primary btn-lg" onclick="saveConfig()">Save to Database</button>
+        <button class="btn btn-secondary" onclick="testConnection()">Test DB Connection</button>
+        <button class="btn btn-secondary" onclick="testEmail()">📧 Send Test Email</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Product Modal -->
+<div class="modal-overlay" id="product-modal">
+  <div class="modal" style="max-width:660px;max-height:90vh;overflow-y:auto">
+    <div class="modal-header"><h3 id="modal-title">Add Product</h3><button class="modal-close" onclick="closeProductModal()">×</button></div>
+    <div class="modal-body product-form">
+
+      <!-- IMAGE UPLOAD -->
+      <div class="form-group">
+        <label>Product Images</label>
+        <div class="img-previews" id="img-previews"></div>
+        <div class="img-upload-zone" id="img-upload-zone"
+          onclick="document.getElementById('img-file-input').click()"
+          ondragover="handleDragOver(event)"
+          ondragleave="handleDragLeave(event)"
+          ondrop="handleDrop(event)">
+          <div class="ico">🖼️</div>
+          <p><strong>Click to upload</strong> or drag &amp; drop</p>
+          <p>PNG, JPG up to 10MB each</p>
+        </div>
+        <div id="img-upload-status"></div>
+        <input type="file" id="img-file-input" accept="image/*" multiple style="display:none" onchange="handleFileSelect(event)">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group"><label>Product Name *</label><input class="form-control" id="pf-name" placeholder="NeuGlow Essential"></div>
+        <div class="form-group"><label>Badge</label><input class="form-control" id="pf-badge" placeholder="Best Seller"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Price ($) *</label><input class="form-control" id="pf-price" type="number" placeholder="149"></div>
+        <div class="form-group"><label>Compare At Price</label><input class="form-control" id="pf-compareAt" type="number" placeholder="199"></div>
+      </div>
+      <div class="form-group"><label>Description</label><textarea class="form-control" id="pf-desc" rows="3" placeholder="Short product description…"></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label>Initial Stock</label><input class="form-control" id="pf-stock" type="number" placeholder="50" value="0"></div>
+        <div class="form-group"><label>SKU</label><input class="form-control" id="pf-sku" placeholder="NG-001"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Icon (emoji)</label><input class="form-control" id="pf-icon" placeholder="💡"></div>
+        <div class="form-group"><label>Rating (0-5)</label><input class="form-control" id="pf-rating" type="number" step="0.1" min="0" max="5" placeholder="4.8"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Review Count</label><input class="form-control" id="pf-reviews" type="number" placeholder="0"></div>
+        <div class="form-group" style="display:flex;align-items:center;gap:10px;padding-top:24px">
+          <input type="checkbox" id="pf-featured" style="width:18px;height:18px">
+          <label for="pf-featured" style="margin:0;text-transform:none;font-size:13px;cursor:pointer">Featured product</label>
+        </div>
+      </div>
+      <div class="form-group" style="display:flex;align-items:center;gap:10px">
+        <input type="checkbox" id="pf-active" checked style="width:18px;height:18px">
+        <label for="pf-active" style="margin:0;text-transform:none;font-size:13px;cursor:pointer">Active (visible in store)</label>
+      </div>
+    </div>
+    <div class="modal-footer" style="display:flex;gap:12px">
+      <button class="btn btn-primary" onclick="saveProduct()" id="save-product-btn">Save Product</button>
+      <button class="btn btn-secondary" onclick="closeProductModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Order Detail Modal -->
+<div class="modal-overlay" id="order-modal">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header"><h3>Order <span id="om-num"></span></h3><button class="modal-close" onclick="closeOrderModal()">×</button></div>
+    <div class="modal-body" id="om-body"></div>
+    <div class="modal-footer" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <label style="font-size:12px;color:var(--warm-gray);text-transform:uppercase;letter-spacing:0.07em">Status:</label>
+      <select class="form-control" id="om-status" style="width:auto">
+        <option value="pending">Pending</option>
+        <option value="paid">Paid</option>
+        <option value="processing">Processing</option>
+        <option value="shipped">Shipped</option>
+        <option value="delivered">Delivered</option>
+        <option value="cancelled">Cancelled</option>
+        <option value="refunded">Refunded</option>
+      </select>
+      <div class="form-group" style="margin:0;flex:1"><input class="form-control" id="om-tracking" placeholder="Tracking number"></div>
+      <button class="btn btn-primary btn-sm" onclick="saveOrder()">Update</button>
+      <button class="btn-danger" onclick="deleteOrder()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal-overlay" id="user-modal">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header"><h3>Edit User</h3><button class="modal-close" onclick="closeUserModal()">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="um-id">
+      <div class="form-group"><label>Full Name</label><input class="form-control" id="um-name" placeholder="Jane Smith"></div>
+      <div class="form-group"><label>Email Address</label><input class="form-control" id="um-email" placeholder="jane@example.com"></div>
+      <hr style="border:none;border-top:1px solid var(--border);margin:20px 0">
+      <div style="font-size:12px;font-weight:600;color:var(--warm-gray);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:12px">Change Password</div>
+      <div class="form-group"><label>New Password <span style="font-weight:400;text-transform:none;font-size:11px">(leave blank to keep current)</span></label><input class="form-control" id="um-password" type="password" placeholder="Min 6 characters"></div>
+    </div>
+    <div class="modal-footer" style="display:flex;gap:12px">
+      <button class="btn btn-primary" onclick="saveUser()" id="save-user-btn">Save Changes</button>
+      <button class="btn btn-secondary" onclick="closeUserModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/api.js"></script>
+<script>
+  let editingProductId = null;
+  let editingOrderId   = null;
+  let allOrders        = [];
+  let productImages    = []; // array of Cloudinary URLs for current product
+
+  const user = API.getUser();
+  if (!user) { window.location = 'account.html'; }
+  else if (user.role !== 'admin') { alert('Admin access only.'); window.location = 'account.html'; }
+  else { document.getElementById('admin-name').textContent = user.name; }
+
+  function showPage(name) {
+    document.querySelectorAll('.admin-page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.sidebar-nav a').forEach(a => a.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    document.getElementById('nav-' + name).classList.add('active');
+    const titles = { dashboard:'Dashboard', products:'Products', inventory:'Inventory', orders:'Orders', users:'Users', config:'Configuration' };
+    document.getElementById('page-title').textContent = titles[name] || name;
+    loaders[name]?.();
+    return false;
+  }
+
+  const loaders = { dashboard:loadDashboard, products:loadProducts, inventory:loadInventory, orders:loadOrders, users:loadUsers, config:loadConfig };
+
+  // ── Dashboard ─────────────────────────────────────────────────────────────
+  async function loadDashboard() {
+    try {
+      const s = await API.admin.stats();
+      document.getElementById('s-rev').textContent = `$${(s.revenue||0).toLocaleString('en',{minimumFractionDigits:2})}`;
+      document.getElementById('s-ord').textContent = s.totalOrders;
+      document.getElementById('s-usr').textContent = s.totalUsers;
+      document.getElementById('s-prd').textContent = s.totalProducts;
+      if (s.lowStock?.length) {
+        document.getElementById('low-stock-alert').innerHTML = `<div class="alert alert-warning">⚠️ Low stock: ${s.lowStock.map(p=>`<strong>${p.name}</strong> (${p.stock} left)`).join(', ')} — <a href="#" onclick="showPage('inventory')" style="color:inherit;font-weight:700">Manage</a></div>`;
+      }
+      const { orders } = await API.admin.orders('?limit=5');
+      renderOrdersTable(orders, 'recent-orders-table', true);
+    } catch(e) { showToast(e.message,'error'); }
+  }
+
+  // ── Products ──────────────────────────────────────────────────────────────
+  async function loadProducts() {
+    try {
+      const products = await API.admin.products();
+      const tbl = document.getElementById('products-table');
+      if (!products.length) { tbl.innerHTML = '<div style="padding:40px;text-align:center;color:var(--warm-gray)">No products yet.</div>'; return; }
+      tbl.innerHTML = `<table class="data-table"><thead><tr><th>Product</th><th>Price</th><th>Stock</th><th>Status</th><th>Featured</th><th>Actions</th></tr></thead><tbody>
+        ${products.map(p => `<tr>
+          <td>
+            ${p.images?.[0] ? `<img src="${p.images[0]}" style="width:36px;height:36px;object-fit:cover;border-radius:6px;vertical-align:middle;margin-right:8px">` : (p.icon||'💡')+' '}
+            <strong>${p.name}</strong>${p.badge?` <span class="pill pill-yellow">${p.badge}</span>`:''}
+          </td>
+          <td>$${p.price}${p.compareAt?` <span style="text-decoration:line-through;color:#BCA98A;font-size:12px">$${p.compareAt}</span>`:''}</td>
+          <td><span class="${p.stock>10?'pill pill-green':p.stock>0?'pill pill-yellow':'pill pill-red'}">${p.stock}</span></td>
+          <td><span class="pill ${p.active?'pill-green':'pill-gray'}">${p.active?'Active':'Hidden'}</span></td>
+          <td>${p.featured?'⭐':'—'}</td>
+          <td><div class="action-btns">
+            <button class="btn-icon" onclick='openProductModal(${JSON.stringify(p)})'>✏️</button>
+            <button class="btn-icon danger" onclick="deleteProduct('${p._id}','${p.name}')">🗑️</button>
+          </div></td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    } catch(e) { showToast(e.message,'error'); }
+  }
+
+  function openProductModal(product = null) {
+    editingProductId = product?._id || null;
+    productImages = product?.images ? [...product.images] : [];
+    document.getElementById('modal-title').textContent = product ? 'Edit Product' : 'Add Product';
+    const f = (id, val) => { const el = document.getElementById(id); if(el) el.value = val ?? ''; };
+    f('pf-name', product?.name); f('pf-badge', product?.badge);
+    f('pf-price', product?.price); f('pf-compareAt', product?.compareAt);
+    f('pf-desc', product?.description); f('pf-stock', product?.stock ?? 0);
+    f('pf-sku', product?.sku); f('pf-icon', product?.icon);
+    f('pf-rating', product?.rating ?? 4.8); f('pf-reviews', product?.reviewCount ?? 0);
+    document.getElementById('pf-featured').checked = !!product?.featured;
+    document.getElementById('pf-active').checked = product ? !!product.active : true;
+    document.getElementById('img-upload-status').innerHTML = '';
+    renderImagePreviews();
+    document.getElementById('product-modal').classList.add('open');
+  }
+
+  function closeProductModal() { document.getElementById('product-modal').classList.remove('open'); editingProductId = null; productImages = []; }
+
+  // ── Image Upload ──────────────────────────────────────────────────────────
+  function renderImagePreviews() {
+    const el = document.getElementById('img-previews');
+    el.innerHTML = productImages.map((url, i) => `
+      <div class="img-preview">
+        <img src="${url}" alt="Product image">
+        <button class="remove-img" onclick="removeImage(${i})">×</button>
+      </div>`).join('');
+  }
+
+  function removeImage(i) { productImages.splice(i, 1); renderImagePreviews(); }
+
+  function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+  function handleDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+  function handleDrop(e) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    uploadFiles(Array.from(e.dataTransfer.files));
+  }
+  function handleFileSelect(e) { uploadFiles(Array.from(e.target.files)); e.target.value = ''; }
+
+  async function uploadFiles(files) {
+    const imageFiles = files.filter(f => f.type.startsWith('image/'));
+    if (!imageFiles.length) return;
+
+    // Get cloudinary config from DB
+    let cfg;
+    try { cfg = await API.config.get(); } catch(e) { showToast('Could not load config','error'); return; }
+
+    const cloudName = cfg.cloudinaryCloud;
+    const preset    = cfg.cloudinaryPreset;
+
+    if (!cloudName || !preset) {
+      showToast('Set Cloudinary Cloud Name and Upload Preset in Config first','error');
+      return;
+    }
+
+    const statusEl = document.getElementById('img-upload-status');
+
+    for (const file of imageFiles) {
+      statusEl.innerHTML = `<div class="img-uploading"><div class="spinner"></div> Uploading ${file.name}…</div>`;
+      try {
+        const fd = new FormData();
+        fd.append('file', file);
+        fd.append('upload_preset', preset);
+
+        const res  = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: fd });
+        const data = await res.json();
+
+        if (data.secure_url) {
+          productImages.push(data.secure_url);
+          renderImagePreviews();
+          statusEl.innerHTML = '';
+        } else {
+          showToast('Upload failed: ' + (data.error?.message || 'Unknown error'), 'error');
+          statusEl.innerHTML = '';
+        }
+      } catch(e) {
+        showToast('Upload error: ' + e.message, 'error');
+        statusEl.innerHTML = '';
+      }
+    }
+  }
+
+  async function saveProduct() {
+    const btn = document.getElementById('save-product-btn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    const data = {
+      name: document.getElementById('pf-name').value,
+      badge: document.getElementById('pf-badge').value,
+      price: +document.getElementById('pf-price').value,
+      compareAt: +document.getElementById('pf-compareAt').value || undefined,
+      description: document.getElementById('pf-desc').value,
+      stock: +document.getElementById('pf-stock').value,
+      sku: document.getElementById('pf-sku').value,
+      icon: document.getElementById('pf-icon').value,
+      rating: +document.getElementById('pf-rating').value,
+      reviewCount: +document.getElementById('pf-reviews').value,
+      featured: document.getElementById('pf-featured').checked,
+      active: document.getElementById('pf-active').checked,
+      images: productImages,
+    };
+    if (!data.name || !data.price) { showToast('Name and price are required','error'); btn.disabled=false; btn.textContent='Save Product'; return; }
+    try {
+      if (editingProductId) await API.admin.updateProduct(editingProductId, data);
+      else await API.admin.createProduct(data);
+      showToast('Product saved ✓','success'); closeProductModal(); loadProducts();
+    } catch(e) { showToast(e.message,'error'); }
+    btn.disabled = false; btn.textContent = 'Save Product';
+  }
+
+  async function deleteProduct(id, name) {
+    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+    try { await API.admin.deleteProduct(id); showToast('Deleted','success'); loadProducts(); }
+    catch(e) { showToast(e.message,'error'); }
+  }
+
+  // ── Inventory ─────────────────────────────────────────────────────────────
+  async function loadInventory() {
+    try {
+      const products = await API.admin.products();
+      const low = products.filter(p => p.trackStock && p.stock <= 5);
+      document.getElementById('inventory-alerts').innerHTML = low.length
+        ? `<div class="alert alert-warning">⚠️ ${low.length} product(s) low stock: ${low.map(p=>`<strong>${p.name}</strong>`).join(', ')}</div>` : '';
+      document.getElementById('inventory-table').innerHTML = `<table class="data-table"><thead><tr><th>Product</th><th>SKU</th><th>Stock</th><th>Status</th><th>Update</th></tr></thead><tbody>
+        ${products.map(p => `<tr>
+          <td><strong>${p.icon||'💡'} ${p.name}</strong></td>
+          <td style="color:var(--warm-gray)">${p.sku||'—'}</td>
+          <td><strong>${p.stock}</strong></td>
+          <td><span class="pill ${p.stock>10?'pill-green':p.stock>0?'pill-yellow':'pill-red'}">${p.stock>10?'In Stock':p.stock>0?'Low Stock':'Out of Stock'}</span></td>
+          <td><div class="stock-cell"><input class="stock-input" type="number" min="0" id="stk-${p._id}" value="${p.stock}"><button class="btn btn-primary btn-sm" onclick="updateStock('${p._id}')">Update</button></div></td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    } catch(e) { showToast(e.message,'error'); }
+  }
+
+  async function updateStock(id) {
+    const val = +document.getElementById('stk-'+id).value;
+    try { await API.admin.updateStock(id, val); showToast('Stock updated ✓','success'); loadInventory(); }
+    catch(e) { showToast(e.message,'error'); }
+  }
+
+  // ── Orders ────────────────────────────────────────────────────────────────
+  async function loadOrders() {
+    try {
+      const data = await API.admin.orders('?limit=100');
+      allOrders = data.orders;
+      document.getElementById('order-count').textContent = `${data.total} total`;
+      renderOrdersTable(allOrders, 'orders-table', false);
+    } catch(e) { showToast(e.message,'error'); }
+  }
+
+  function filterOrders() {
+    const q = document.getElementById('order-status-filter').value.toLowerCase();
+    const filtered = q ? allOrders.filter(o => o.status.includes(q) || o.orderNumber?.toLowerCase().includes(q)) : allOrders;
+    renderOrdersTable(filtered, 'orders-table', false);
+  }
+
+  function renderOrdersTable(orders, containerId, compact) {
+    const el = document.getElementById(containerId);
+    if (!orders?.length) { el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--warm-gray)">No orders found.</div>'; return; }
+    const pillMap = {paid:'pill-green',pending:'pill-yellow',processing:'pill-blue',shipped:'pill-blue',delivered:'pill-green',cancelled:'pill-red',refunded:'pill-gray'};
+    el.innerHTML = `<table class="data-table"><thead><tr>
+      <th>Order #</th><th>Customer</th><th>Total</th><th>Status</th><th>Date</th>${compact?'':'<th>Actions</th>'}
+    </tr></thead><tbody>
+      ${orders.map(o => `<tr>
+        <td><strong>${o.orderNumber}</strong></td>
+        <td>${o.user?.name||'—'}<br><span style="font-size:11px;color:var(--warm-gray)">${o.user?.email||''}</span></td>
+        <td><strong>$${o.total?.toFixed(2)||'0.00'}</strong></td>
+        <td><span class="pill ${pillMap[o.status]||'pill-gray'}">${o.status}</span></td>
+        <td style="font-size:12px;color:var(--warm-gray)">${new Date(o.createdAt).toLocaleDateString()}</td>
+        ${compact?'':` <td><div class="action-btns"><button class="btn-icon" onclick="openOrderModal(${JSON.stringify(o).replace(/"/g,'&quot;')})">📋</button></div></td>`}
+      </tr>`).join('')}
+    </tbody></table>`;
+  }
+
+  function openOrderModal(order) {
+    editingOrderId = order._id;
+    document.getElementById('om-num').textContent = order.orderNumber;
+    document.getElementById('om-status').value = order.status;
+    document.getElementById('om-tracking').value = order.trackingNumber || '';
+    document.getElementById('om-body').innerHTML = `
+      <div style="margin-bottom:14px">
+        <div style="font-size:12px;color:var(--warm-gray);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">Items</div>
+        ${(order.items||[]).map(i=>`<div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)"><span>${i.name} × ${i.qty}</span><strong>$${(i.price*i.qty).toFixed(2)}</strong></div>`).join('')}
+      </div>
+      <div style="display:flex;justify-content:space-between;font-weight:700;margin-bottom:14px"><span>Total</span><span>$${order.total?.toFixed(2)}</span></div>
+      ${order.shippingAddress?`<div style="font-size:12px;color:var(--warm-gray)"><strong>Ship to:</strong> ${order.shippingAddress.name||''}, ${order.shippingAddress.line1||''}, ${order.shippingAddress.city||''} ${order.shippingAddress.zip||''}</div>`:''}`;
+    document.getElementById('order-modal').classList.add('open');
+  }
+
+  function closeOrderModal() { document.getElementById('order-modal').classList.remove('open'); editingOrderId = null; }
+
+  async function saveOrder() {
+    try {
+      await API.admin.updateOrder(editingOrderId, {
+        status: document.getElementById('om-status').value,
+        trackingNumber: document.getElementById('om-tracking').value,
+      });
+      showToast('Order updated ✓','success'); closeOrderModal(); loadOrders();
+    } catch(e) { showToast(e.message,'error'); }
+  }
+
+  async function deleteOrder() {
+    if (!confirm('Delete this order permanently?')) return;
+    try {
+      await fetch(`/api/admin/orders/${editingOrderId}`, { method:'DELETE', headers:{'Authorization':'Bearer '+API.getToken()} });
+      showToast('Order deleted','success'); closeOrderModal(); loadOrders();
+    } catch(e) { showToast(e.message,'error'); }
+  }
+
+  async function clearAllOrders() {
+    if (!confirm('Delete ALL orders permanently? This cannot be undone.')) return;
+    if (!confirm('Are you absolutely sure?')) return;
+    try {
+      const res  = await fetch('/api/admin/orders', { method:'DELETE', headers:{'Authorization':'Bearer '+API.getToken()} });
+      const data = await res.json();
+      showToast(`Cleared ${data.deleted} orders ✓`,'success'); loadOrders(); loadDashboard();
+    } catch(e) { showToast(e.message,'error'); }
+  }
+
+  // ── Users ─────────────────────────────────────────────────────────────────
+  async function loadUsers() {
+    try {
+      const users = await API.admin.users();
+      document.getElementById('users-table').innerHTML = `<table class="data-table"><thead><tr>
+        <th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th>
+      </tr></thead><tbody>
+        ${users.map(u => `<tr>
+          <td><strong>${u.name}</strong></td>
+          <td>${u.email}</td>
+          <td><span class="pill ${u.role==='admin'?'pill-red':'pill-blue'}">${u.role}</span></td>
+          <td style="font-size:12px;color:var(--warm-gray)">${new Date(u.createdAt).toLocaleDateString()}</td>
+          <td><div class="action-btns">
+            <button class="btn-icon" onclick="openUserModal(${JSON.stringify(u).replace(/"/g,'&quot;')})" title="Edit">✏️</button>
+            <button class="btn-icon" onclick="toggleRole('${u._id}','${u.role}')" title="${u.role==='admin'?'Make Customer':'Make Admin'}" ${u._id===user.id?'disabled':''}>
+              ${u.role==='admin'?'👤':'🔑'}
+            </button>
+            <button class="btn-icon danger" onclick="deleteUser('${u._id}','${u.name}')" title="Delete" ${u._id===user.id?'disabled':''}>🗑️</button>
+          </div></td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    } catch(e) { showToast(e.message,'error'); }
+  }
+
+  function openUserModal(u) {
+    document.getElementById('um-id').value    = u._id;
+    document.getElementById('um-name').value  = u.name;
+    document.getElementById('um-email').value = u.email;
+    document.getElementById('um-password').value = '';
+    document.getElementById('user-modal').classList.add('open');
+  }
+
+  function closeUserModal() { document.getElementById('user-modal').classList.remove('open'); }
+
+  async function saveUser() {
+    const btn = document.getElementById('save-user-btn');
+    btn.disabled = true; btn.textContent = 'Saving…';
+    const id       = document.getElementById('um-id').value;
+    const name     = document.getElementById('um-name').value.trim();
+    const email    = document.getElementById('um-email').value.trim();
+    const password = document.getElementById('um-password').value;
+    try {
+      const r = await fetch(`/api/admin/users/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+API.getToken() },
+        body: JSON.stringify({ name, email }),
+      });
+      const d = await r.json();
+      if (d.error) throw new Error(d.error);
+      if (password) {
+        const pr = await fetch(`/api/admin/users/${id}/password`, {
+          method: 'PUT',
+          headers: { 'Content-Type':'application/json', 'Authorization':'Bearer '+API.getToken() },
+          body: JSON.stringify({ password }),
+        });
+        const pd = await pr.json();
+        if (pd.error) throw new Error(pd.error);
+      }
+      showToast('User updated ✓','success'); closeUserModal(); loadUsers();
+    } catch(e) { showToast(e.message,'error'); }
+    btn.disabled = false; btn.textContent = 'Save Changes';
+  }
+
+  async function toggleRole(id, currentRole) {
+    const newRole = currentRole === 'admin' ? 'customer' : 'admin';
+    if (!confirm(`Change role to ${newRole}?`)) return;
+    try { await API.admin.updateUserRole(id, newRole); showToast('Role updated ✓','success'); loadUsers(); }
+    catch(e) { showToast(e.message,'error'); }
+  }
+
+  async function deleteUser(id, name) {
+    if (!confirm(`Delete user "${name}"? This cannot be undone.`)) return;
+    try {
+      await fetch(`/api/admin/users/${id}`, { method:'DELETE', headers:{'Authorization':'Bearer '+API.getToken()} });
+      showToast('User deleted','success'); loadUsers();
+    } catch(e) { showToast(e.message,'error'); }
+  }
+
+  // ── Config ────────────────────────────────────────────────────────────────
+  async function loadConfig() {
+    try {
+      const cfg = await API.config.get();
+      const f = (id, val) => { const el = document.getElementById(id); if(el && val) el.value = val; };
+      f('cfg-jwtSecret', cfg.jwtSecret); f('cfg-jwtExpiry', cfg.jwtExpiry);
+      f('cfg-stripePublishableKey', cfg.stripePublishableKey); f('cfg-stripeSecretKey', cfg.stripeSecretKey);
+      f('cfg-cloudinaryCloud', cfg.cloudinaryCloud); f('cfg-cloudinaryPreset', cfg.cloudinaryPreset);
+      f('cfg-smtpHost', cfg.smtpHost); f('cfg-smtpPort', cfg.smtpPort);
+      f('cfg-smtpUser', cfg.smtpUser); f('cfg-smtpPass', cfg.smtpPass); f('cfg-smtpFrom', cfg.smtpFrom);
+      f('cfg-storeName', cfg.storeName); f('cfg-supportEmail', cfg.supportEmail);
+      if (cfg.currency) document.getElementById('cfg-currency').value = cfg.currency;
+    } catch(e) { showToast('Could not load config: '+e.message,'error'); }
+  }
+
+  async function saveConfig() {
+    const data = {};
+    ['jwtSecret','jwtExpiry','stripePublishableKey','stripeSecretKey','cloudinaryCloud','cloudinaryPreset',
+     'smtpHost','smtpPort','smtpUser','smtpPass','smtpFrom','storeName','supportEmail','currency']
+      .forEach(k => { const el = document.getElementById('cfg-'+k); if(el) data[k] = el.value; });
+    try { await API.config.save(data); showToast('Configuration saved to MongoDB ✓','success'); }
+    catch(e) { showToast(e.message,'error'); }
+  }
+
+  async function testConnection() {
+    try {
+      const r = await API.config.test();
+      showToast(r.ok ? `✓ MongoDB ${r.status}` : '✗ Not connected', r.ok ? 'success' : 'error');
+    } catch(e) { showToast('Connection failed','error'); }
+  }
+
+  async function testEmail() {
+    try {
+      const res  = await fetch('/api/config/test-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API.getToken() },
+      });
+      const data = await res.json();
+      if (data.ok) showToast('✓ ' + data.message, 'success');
+      else showToast('✗ ' + data.error, 'error');
+    } catch(e) { showToast('Email test failed: ' + e.message, 'error'); }
+  }
+
+  function adminLogout() { API.auth.logout(); window.location = 'account.html'; }
+
+  loadDashboard();
+</script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="NeuGlow — 40Hz M+ brain-care lamp powered by Delta M+ Technology. Illuminate wisdom every day.">
+<title>NeuGlow — Illuminate Wisdom</title>
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav id="navbar">
+  <a href="index.html" class="nav-logo">Neu<span>Glow</span></a>
+  <div class="nav-links">
+    <a href="#products">Shop</a>
+    <a href="#science">Science</a>
+    <a href="#faq">FAQ</a>
+    <a href="cart.html">Cart</a>
+    <!-- <a href="admin.html">Admin</a> -->
+  </div>
+  <div class="nav-actions">
+    <button class="btn-auth" onclick="openModal('auth')">Sign In</button>
+    <button class="btn-cart" onclick="openCart()">
+      Cart <span class="cart-count" id="cartCount">0</span>
+    </button>
+  </div>
+  <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section id="hero">
+  <div class="hero-content">
+    <div class="hero-badge">Powered by Delta M+ Technology</div>
+    <h1 class="hero-title">
+      Illuminate<br><em>Wisdom</em><br>with Light
+    </h1>
+    <p class="hero-desc">
+      NeuGlow harnesses MIT-researched 40Hz Gamma light technology to support brain health, sharpen memory, and protect cognitive function — effortlessly, every day.
+    </p>
+    <div class="hero-actions">
+      <a href="#products" class="btn-primary">Shop Now</a>
+      <a href="#science"  class="btn-secondary">The Science</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item"><div class="stat-num">40Hz</div><div class="stat-label">Gamma Frequency</div></div>
+      <div class="stat-item"><div class="stat-num">83%</div><div class="stat-label">Reduced Decline</div></div>
+      <div class="stat-item"><div class="stat-num">1hr</div><div class="stat-label">Daily Usage</div></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="lamp-container">
+      <div class="lamp-glow"></div>
+      <div class="lamp-body">&#128161;</div>
+      <div class="lamp-circle"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FEATURES ===== -->
+<section id="features">
+  <div class="features-header">
+    <div class="section-label">Why NeuGlow</div>
+    <h2 class="section-title">Engineered for <em>Your Brain</em></h2>
+    <p class="section-desc">Every detail designed to deliver effortless, effective 40Hz Gamma stimulation.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card"><div class="feature-icon">&#129504;</div><div class="feature-title">Flicker-Free Design</div><div class="feature-desc">Delta's patented M+ technology embeds 40Hz oscillations invisibly within normal light — no headaches, no discomfort.</div></div>
+    <div class="feature-card"><div class="feature-icon">&#9889;</div><div class="feature-title">Ultra-Low Power</div><div class="feature-desc">Only 1.5W consumption. Run NeuGlow all day with negligible energy cost. Powered by any USB-C source.</div></div>
+    <div class="feature-card"><div class="feature-icon">&#128300;</div><div class="feature-title">Clinically Tested</div><div class="feature-desc">Backed by published research from Kaohsiung Medical University and foundational MIT neuroscience studies.</div></div>
+    <div class="feature-card"><div class="feature-icon">&#127807;</div><div class="feature-title">Non-Invasive</div><div class="feature-desc">No drugs, no radiation, no side effects. Simply place NeuGlow nearby and continue your daily routine.</div></div>
+    <div class="feature-card"><div class="feature-icon">&#128241;</div><div class="feature-title">Portable</div><div class="feature-desc">Compact, lightweight design goes wherever you do. Office, home, or travel — brain care anytime.</div></div>
+    <div class="feature-card"><div class="feature-icon">&#128274;</div><div class="feature-title">Quality Verified</div><div class="feature-desc">Every unit tested with professional optical instruments to confirm precise 40Hz output before shipping.</div></div>
+  </div>
+</section>
+
+<!-- ===== PRODUCTS ===== -->
+<section id="products">
+  <div class="products-header">
+    <div>
+      <div class="section-label">Our Products</div>
+      <h2 class="section-title">Choose Your <em>NeuGlow</em></h2>
+    </div>
+    <p class="section-desc" style="max-width:260px;font-size:.88rem;">Premium brain-care lighting for every lifestyle and need.</p>
+  </div>
+  <div class="products-grid" id="productsGrid"></div>
+</section>
+
+<!-- ===== SCIENCE ===== -->
+<section id="science">
+  <div class="science-grid">
+    <div class="science-content">
+      <div class="section-label">The Science</div>
+      <h2 class="section-title">Backed by <em>Research</em></h2>
+      <p class="section-desc">Professor Li-Huei Tsai of MIT pioneered 40Hz auditory-visual stimulation therapy. A Phase II clinical trial showed remarkable results in 76 Alzheimer's patients over 6 months.</p>
+      <div class="research-list">
+        <div class="research-item"><div class="research-num">01</div><div class="research-text"><h4>Alzheimer's Disease</h4><p>Wang et al. (2020) — Journal of Alzheimer's Disease: 40Hz light improved cognitive and memory function while reducing behavioral abnormalities.</p></div></div>
+        <div class="research-item"><div class="research-num">02</div><div class="research-text"><h4>Sleep &amp; Insomnia</h4><p>Chen et al. (2021) — Sleep Medicine: 40Hz therapy improved sleep quality, duration, and reduced daytime fatigue.</p></div></div>
+        <div class="research-item"><div class="research-num">03</div><div class="research-text"><h4>Parkinson's Disease</h4><p>Baltus et al. (2021) — Frontiers in Human Neuroscience: Alleviated motor and cognitive impairments; promoted neural regeneration.</p></div></div>
+        <div class="research-item"><div class="research-num">04</div><div class="research-text"><h4>Depression &amp; ADHD</h4><p>Multiple studies report improvements in emotional state, focus, and reduced anxiety symptoms with regular 40Hz exposure.</p></div></div>
+      </div>
+    </div>
+    <div class="science-visual">
+      <div class="hz-display">
+        <div class="hz-number">40</div>
+        <div class="hz-label">Hz &middot; Gamma Wave</div>
+      </div>
+      <div class="science-stats">
+        <div class="sci-stat"><div class="sci-stat-num">83%</div><div class="sci-stat-label">Memory decline reduced</div></div>
+        <div class="sci-stat"><div class="sci-stat-num">61%</div><div class="sci-stat-label">Brain atrophy reduced</div></div>
+        <div class="sci-stat"><div class="sci-stat-num">76</div><div class="sci-stat-label">Clinical trial patients</div></div>
+        <div class="sci-stat"><div class="sci-stat-num">6mo</div><div class="sci-stat-label">Trial duration</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section id="faq">
+  <div class="faq-grid">
+    <div>
+      <div class="section-label">FAQ</div>
+      <h2 class="section-title">Common <em>Questions</em></h2>
+      <p class="section-desc">Everything you need to know about NeuGlow and 40Hz brain-care technology.</p>
+    </div>
+    <div class="faq-list" id="faqList"></div>
+  </div>
+</section>
+
+<!-- ===== MARKETING ===== -->
+<section id="marketing">
+  <div class="marketing-inner">
+    <div class="section-label">Stay Informed</div>
+    <h2 class="section-title">Join the <em>NeuGlow</em> Community</h2>
+    <p class="section-desc">Get the latest neuroscience research, usage tips, and exclusive offers delivered to your inbox.</p>
+    <div class="subscribe-form">
+      <input type="email" id="emailInput" placeholder="Enter your email address">
+      <button onclick="subscribe()">Subscribe</button>
+    </div>
+    <div class="marketing-perks">
+      <div class="perk"><div class="perk-dot"></div> Research updates</div>
+      <div class="perk"><div class="perk-dot"></div> Usage tips</div>
+      <div class="perk"><div class="perk-dot"></div> Early access offers</div>
+      <div class="perk"><div class="perk-dot"></div> No spam, ever</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="index.html" class="nav-logo">Neu<span style="color:var(--cream)">Glow</span></a>
+      <p class="footer-desc">Powered by Delta M+ Technology. Illuminating cognitive wellness through the science of light.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Shop</div>
+      <div class="footer-links"><a href="#products">NeuGlow Lamp</a><a href="#products">Bundle Sets</a><a href="#products">Accessories</a></div>
+    </div>
+    <div>
+      <div class="footer-col-title">Info</div>
+      <div class="footer-links"><a href="#science">Research</a><a href="#faq">FAQ</a><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
+    </div>
+    <div>
+      <div class="footer-col-title">Support</div>
+      <div class="footer-links"><a href="#">Contact Us</a><a href="cart.html">View Cart</a><a href="#">Warranty</a><a href="#">Track Order</a></div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; 2025 NeuGlow. Powered by Delta M+ Technology.</span>
+    <span>Made with &#129504; for brain health</span>
+  </div>
+</footer>
+
+<!-- CART OVERLAY + PANEL -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-header">
+    <div class="cart-header-title">Your Cart</div>
+    <button class="cart-close" onclick="closeCart()">&#10005;</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer">
+    <div class="cart-subtotal">
+      <span>Subtotal</span>
+      <span class="cart-subtotal-price" id="cartTotal">$0.00</span>
+    </div>
+    <a href="cart.html" class="btn-full" style="text-align:center;display:block;text-decoration:none;margin-top:8px">View Full Cart &rarr;</a>
+    <button class="btn-full" style="margin-top:10px;background:var(--dark)" onclick="goToCheckout()">Checkout →</button>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('auth')">&#10005;</button>
+    <div class="modal-title">Welcome</div>
+    <div class="modal-subtitle">Sign in to your NeuGlow account</div>
+    <div class="modal-tabs">
+      <button class="modal-tab active" onclick="switchTab('login')">Sign In</button>
+      <button class="modal-tab" onclick="switchTab('register')">Register</button>
+    </div>
+    <div id="loginForm">
+      <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" id="loginEmail" placeholder="you@example.com"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="loginPassword" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div>
+      <button class="btn-full" onclick="handleLogin()">Sign In &rarr;</button>
+    </div>
+    <div id="registerForm" style="display:none">
+      <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" type="text" id="regName" placeholder="Your Name"></div>
+      <div class="form-group"><label class="form-label">Email Address</label><input class="form-input" type="email" id="regEmail" placeholder="you@example.com"></div>
+      <div class="form-group"><label class="form-label">Password</label><input class="form-input" type="password" id="regPassword" placeholder="Create a password"></div>
+      <button class="btn-full" onclick="handleRegister()">Create Account &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span class="toast-icon">&#10003;</span><span id="toastMsg"></span></div>
+<script src="js/api.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

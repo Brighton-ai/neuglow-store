@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup — NeuGlow</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: var(--dark); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 70% 70% at 30% 20%, rgba(232,82,10,0.15) 0%, transparent 60%); pointer-events: none; }
+    .setup-card { background: white; border-radius: var(--r-lg); width: 100%; max-width: 560px; overflow: hidden; box-shadow: var(--shadow-lg); position: relative; }
+    .setup-header { background: linear-gradient(135deg, var(--dark), var(--dark-mid)); padding: 36px 36px 28px; text-align: center; }
+    .setup-logo { font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: var(--cream); }
+    .setup-logo span { color: var(--orange); }
+    .setup-header p { color: rgba(248,244,238,0.55); font-size: 13px; margin-top: 8px; }
+    .setup-body { padding: 32px 36px; }
+    .setup-step { display: none; }
+    .setup-step.active { display: block; }
+    .setup-step h3 { font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 6px; }
+    .setup-step p { font-size: 13px; color: var(--warm-gray); margin-bottom: 22px; }
+    .step-indicator { display: flex; gap: 6px; justify-content: center; margin-bottom: 28px; }
+    .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: var(--transition); }
+    .step-dot.active { background: var(--orange); transform: scale(1.2); }
+    .section-divider { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--warm-gray); margin: 20px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+    .success-screen { text-align: center; padding: 20px 0; }
+    .success-ico { font-size: 4rem; margin-bottom: 16px; }
+    .success-screen h3 { color: #2D6A4F; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+<div class="setup-card">
+  <div class="setup-header">
+    <div class="setup-logo">Neu<span>Glow</span></div>
+    <p>First-time Store Setup · All config saved to MongoDB</p>
+  </div>
+  <div class="setup-body">
+    <div class="step-indicator">
+      <div class="step-dot active" id="dot-1"></div>
+      <div class="step-dot" id="dot-2"></div>
+      <div class="step-dot" id="dot-3"></div>
+    </div>
+
+    <!-- Step 1: Admin Account -->
+    <div class="setup-step active" id="step-1">
+      <h3>Create Admin Account</h3>
+      <p>This will be the store owner account. Keep these credentials safe.</p>
+      <div class="form-group"><label>Admin Name</label><input class="form-control" id="s-aname" placeholder="Store Owner"></div>
+      <div class="form-group"><label>Admin Email</label><input class="form-control" id="s-aemail" type="email" placeholder="admin@neuglow.com"></div>
+      <div class="form-group"><label>Password</label><input class="form-control" id="s-apass" type="password" placeholder="Min 6 characters"></div>
+      <button class="btn btn-primary btn-full btn-lg" onclick="nextStep(2)">Next: Payments →</button>
+    </div>
+
+    <!-- Step 2: Stripe & Email -->
+    <div class="setup-step" id="step-2">
+      <h3>Payments & Email</h3>
+      <p>Stripe keys and SMTP credentials are encrypted in MongoDB. Never stored in files.</p>
+      <div class="section-divider">💳 Stripe</div>
+      <div class="form-group"><label>Publishable Key</label><input class="form-control" id="s-spk" placeholder="pk_live_… (or pk_test_… for testing)"></div>
+      <div class="form-group"><label>Secret Key</label><input class="form-control" id="s-ssk" type="password" placeholder="sk_live_…"></div>
+      <div class="section-divider">📧 SMTP Email</div>
+      <div class="form-row">
+        <div class="form-group"><label>Host</label><input class="form-control" id="s-smtp-h" placeholder="smtp.gmail.com"></div>
+        <div class="form-group"><label>Port</label><input class="form-control" id="s-smtp-p" value="587"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Username</label><input class="form-control" id="s-smtp-u" placeholder="you@gmail.com"></div>
+        <div class="form-group"><label>Password</label><input class="form-control" id="s-smtp-pw" type="password" placeholder="App password"></div>
+      </div>
+      <div style="display:flex;gap:12px">
+        <button class="btn btn-secondary" onclick="nextStep(1)">← Back</button>
+        <button class="btn btn-primary btn-lg" onclick="nextStep(3)">Next: Store Info →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Store meta -->
+    <div class="setup-step" id="step-3">
+      <h3>Store Information</h3>
+      <p>Basic store settings — you can change these anytime in the admin config panel.</p>
+      <div class="form-group"><label>Store Name</label><input class="form-control" id="s-sname" value="NeuGlow"></div>
+      <div class="form-group"><label>Support Email</label><input class="form-control" id="s-semail" placeholder="support@neuglow.com"></div>
+      <div class="form-group"><label>Currency</label>
+        <select class="form-control" id="s-curr">
+          <option value="USD">USD — US Dollar</option>
+          <option value="EUR">EUR — Euro</option>
+          <option value="GBP">GBP — British Pound</option>
+          <option value="TWD">TWD — Taiwan Dollar</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:12px">
+        <button class="btn btn-secondary" onclick="nextStep(2)">← Back</button>
+        <button class="btn btn-primary btn-lg" onclick="completeSetup()" id="setup-btn">Complete Setup 🚀</button>
+      </div>
+    </div>
+
+    <!-- Success -->
+    <div class="setup-step" id="step-4">
+      <div class="success-screen">
+        <div class="success-ico">🎉</div>
+        <h3>Setup Complete!</h3>
+        <p>Your store is ready. All credentials are saved to MongoDB.</p>
+        <div style="background:#F0FDF4;border-radius:var(--r-sm);padding:14px;margin:20px 0;font-size:13px;color:#065F46;border:1px solid #A7F3D0">
+          ✅ Admin account created<br>
+          ✅ Stripe keys saved to DB<br>
+          ✅ SMTP config saved to DB<br>
+          ✅ Ready for git push (no secrets in code)
+        </div>
+        <a href="/admin" class="btn btn-primary btn-full btn-lg">Go to Admin Panel →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<script src="js/api.js"></script>
+<script>
+  let currentStep = 1;
+
+  function nextStep(n) {
+    // Validate current step
+    if (n === 2) {
+      if (!document.getElementById('s-aemail').value || !document.getElementById('s-apass').value)
+        return showToast('Email and password are required', 'error');
+    }
+    document.getElementById('step-' + currentStep).classList.remove('active');
+    document.getElementById('dot-' + currentStep)?.classList.remove('active');
+    currentStep = n;
+    document.getElementById('step-' + currentStep).classList.add('active');
+    document.getElementById('dot-' + currentStep)?.classList.add('active');
+  }
+
+  async function completeSetup() {
+    const btn = document.getElementById('setup-btn');
+    btn.disabled = true; btn.textContent = 'Setting up…';
+    try {
+      const payload = {
+        adminName:     document.getElementById('s-aname').value,
+        adminEmail:    document.getElementById('s-aemail').value,
+        adminPassword: document.getElementById('s-apass').value,
+        stripePublishableKey: document.getElementById('s-spk').value,
+        stripeSecretKey:      document.getElementById('s-ssk').value,
+        smtpHost:  document.getElementById('s-smtp-h').value,
+        smtpPort:  +document.getElementById('s-smtp-p').value,
+        smtpUser:  document.getElementById('s-smtp-u').value,
+        smtpPass:  document.getElementById('s-smtp-pw').value,
+        storeName: document.getElementById('s-sname').value,
+        supportEmail: document.getElementById('s-semail').value,
+        currency:  document.getElementById('s-curr').value,
+      };
+      const res = await fetch('/api/config/setup', {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      nextStep(4);
+    } catch(e) {
+      showToast(e.message, 'error');
+      btn.disabled = false; btn.textContent = 'Complete Setup 🚀';
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+# The ONLY secret file — contains just the MongoDB connection URI
+# Everything else (Stripe, SMTP, JWT) is stored IN the database
+mongo-uri.json
+
+# Dependencies
+node_modules/
+
+# OS / editor junk
+.DS_Store
+*.swp
+.vscode/
