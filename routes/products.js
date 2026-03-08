@@ -6,6 +6,7 @@ router.get('/', async (req, res) => {
   try {
     const filter = { active: true };
     if (req.query.featured === 'true') filter.featured = true;
+    if (req.query.category && req.query.category !== 'all') filter.category = req.query.category;
     const products = await Product.find(filter).sort({ createdAt: -1 });
     res.json(products);
   } catch (e) { res.status(500).json({ error: e.message }); }
