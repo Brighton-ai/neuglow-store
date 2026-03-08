@@ -1,6 +1,5 @@
 /**
  * js/api.js — NeuGlow API Client
- * All fetch calls go through here so auth headers are always attached.
  */
 
 const API = (() => {
@@ -39,8 +38,8 @@ const API = (() => {
     },
 
     products: {
-      list:    ()   => req('GET', '/products'),
-      get:     (id) => req('GET', `/products/${id}`),
+      list:     (category) => req('GET', '/products' + (category && category !== 'all' ? `?category=${category}` : '')),
+      get:      (id) => req('GET', `/products/${id}`),
     },
 
     orders: {
@@ -49,16 +48,16 @@ const API = (() => {
     },
 
     admin: {
-      stats:         ()       => req('GET',    '/admin/stats'),
-      products:      ()       => req('GET',    '/admin/products'),
-      createProduct: (data)   => req('POST',   '/admin/products',        data),
-      updateProduct: (id, d)  => req('PUT',    `/admin/products/${id}`,   d),
-      deleteProduct: (id)     => req('DELETE', `/admin/products/${id}`),
-      updateStock:   (id, stock) => req('PATCH', `/admin/products/${id}/stock`, { stock }),
-      orders:        (q = '') => req('GET',    '/admin/orders' + q),
-      updateOrder:   (id, d)  => req('PUT',    `/admin/orders/${id}`,     d),
-      users:         ()       => req('GET',    '/admin/users'),
-      updateUserRole:(id, role) => req('PUT',  `/admin/users/${id}/role`, { role }),
+      stats:         ()          => req('GET',    '/admin/stats'),
+      products:      ()          => req('GET',    '/admin/products'),
+      createProduct: (data)      => req('POST',   '/admin/products',           data),
+      updateProduct: (id, d)     => req('PUT',    `/admin/products/${id}`,      d),
+      deleteProduct: (id)        => req('DELETE', `/admin/products/${id}`),
+      updateStock:   (id, stock) => req('PATCH',  `/admin/products/${id}/stock`, { stock }),
+      orders:        (q = '')    => req('GET',    '/admin/orders' + q),
+      updateOrder:   (id, d)     => req('PUT',    `/admin/orders/${id}`,         d),
+      users:         ()          => req('GET',    '/admin/users'),
+      updateUserRole:(id, role)  => req('PUT',    `/admin/users/${id}/role`,     { role }),
     },
 
     config: {
@@ -109,15 +108,13 @@ const Cart = {
 };
 
 function updateCartBadge() {
-  const badges = document.querySelectorAll('.cart-badge');
+  const badges = document.querySelectorAll('.cart-badge, #cartCount');
   const count = Cart.count();
-  badges.forEach(b => { b.textContent = count; b.style.display = count ? 'flex' : 'none'; });
+  badges.forEach(b => { b.textContent = count; });
 }
 
-// Init cart badge on load
 document.addEventListener('DOMContentLoaded', () => {
   updateCartBadge();
-  // Navbar scroll effect
   const nav = document.querySelector('.navbar');
   if (nav) {
     window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 30), { passive: true });
