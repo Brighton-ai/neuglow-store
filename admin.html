@@ -286,6 +286,13 @@
         <div class="form-group"><label>Compare At Price</label><input class="form-control" id="pf-compareAt" type="number" placeholder="199"></div>
       </div>
       <div class="form-group"><label>Description</label><textarea class="form-control" id="pf-desc" rows="3" placeholder="Short product description…"></textarea></div>
+      <div class="form-group"><label>Category</label>
+        <select class="form-control" id="pf-category">
+          <option value="lamps">💡 Lamps</option>
+          <option value="bundles">📦 Bundles</option>
+          <option value="accessories">🔌 Accessories</option>
+        </select>
+      </div>
       <div class="form-row">
         <div class="form-group"><label>Initial Stock</label><input class="form-control" id="pf-stock" type="number" placeholder="50" value="0"></div>
         <div class="form-group"><label>SKU</label><input class="form-control" id="pf-sku" placeholder="NG-001"></div>
@@ -403,12 +410,13 @@
       const products = await API.admin.products();
       const tbl = document.getElementById('products-table');
       if (!products.length) { tbl.innerHTML = '<div style="padding:40px;text-align:center;color:var(--warm-gray)">No products yet.</div>'; return; }
-      tbl.innerHTML = `<table class="data-table"><thead><tr><th>Product</th><th>Price</th><th>Stock</th><th>Status</th><th>Featured</th><th>Actions</th></tr></thead><tbody>
+      tbl.innerHTML = `<table class="data-table"><thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Status</th><th>Featured</th><th>Actions</th></tr></thead><tbody>
         ${products.map(p => `<tr>
           <td>
             ${p.images?.[0] ? `<img src="${p.images[0]}" style="width:36px;height:36px;object-fit:cover;border-radius:6px;vertical-align:middle;margin-right:8px">` : (p.icon||'💡')+' '}
             <strong>${p.name}</strong>${p.badge?` <span class="pill pill-yellow">${p.badge}</span>`:''}
           </td>
+          <td><span style='font-size:11px;text-transform:capitalize;color:#BCA98A'>${p.category||'lamps'}</span></td>
           <td>$${p.price}${p.compareAt?` <span style="text-decoration:line-through;color:#BCA98A;font-size:12px">$${p.compareAt}</span>`:''}</td>
           <td><span class="${p.stock>10?'pill pill-green':p.stock>0?'pill pill-yellow':'pill pill-red'}">${p.stock}</span></td>
           <td><span class="pill ${p.active?'pill-green':'pill-gray'}">${p.active?'Active':'Hidden'}</span></td>
@@ -431,6 +439,7 @@
     f('pf-price', product?.price); f('pf-compareAt', product?.compareAt);
     f('pf-desc', product?.description); f('pf-stock', product?.stock ?? 0);
     f('pf-sku', product?.sku); f('pf-icon', product?.icon);
+    document.getElementById('pf-category').value = product?.category || 'lamps';
     f('pf-rating', product?.rating ?? 4.8); f('pf-reviews', product?.reviewCount ?? 0);
     document.getElementById('pf-featured').checked = !!product?.featured;
     document.getElementById('pf-active').checked = product ? !!product.active : true;
@@ -517,6 +526,7 @@
       stock: +document.getElementById('pf-stock').value,
       sku: document.getElementById('pf-sku').value,
       icon: document.getElementById('pf-icon').value,
+      category: document.getElementById('pf-category').value,
       rating: +document.getElementById('pf-rating').value,
       reviewCount: +document.getElementById('pf-reviews').value,
       featured: document.getElementById('pf-featured').checked,
