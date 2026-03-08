@@ -5,6 +5,8 @@ const User    = require('../models/User');
 const auth    = require('../middleware/auth');
 const { sendMail, orderConfirmationEmail, adminOrderEmail, orderShippedEmail } = require('../config/mailer');
 
+const TAX_RATE = 0.08;
+
 // POST /api/orders  — place an order (non-Stripe fallback)
 router.post('/', auth, async (req, res) => {
   try {
@@ -26,7 +28,7 @@ router.post('/', auth, async (req, res) => {
       enriched.push({ product: p._id, name: p.name, price: p.price, qty: item.qty });
     }
 
-    const tax   = +(subtotal * 0.08).toFixed(2);
+    const tax   = +(subtotal * TAX_RATE).toFixed(2);
     const total = +(subtotal + tax).toFixed(2);
 
     const order = await Order.create({
@@ -38,7 +40,6 @@ router.post('/', auth, async (req, res) => {
       status: paymentIntent ? 'paid' : 'pending',
     });
 
-    // Send emails (non-blocking)
     const cfg  = req.app.locals.cfg;
     const user = await User.findById(req.user.id).select('name email');
     if (user) {
@@ -73,22 +74,34 @@ router.post('/checkout', auth, async (req, res) => {
       enriched.push({ product: p, qty: item.qty });
     }
 
-    const line_items = enriched.map(({ product: p, qty }) => ({
-      price_data: {
-        currency: (cfg.currency || 'usd').toLowerCase(),
-        product_data: {
-          name: p.name,
-          description: p.description || undefined,
-          images: p.images?.[0] ? [p.images[0]] : undefined,
-        },
-        unit_amount: Math.round(p.price * 100),
-      },
-      quantity: qty,
-    }));
+    const subtotal = enriched.reduce((s, { product: p, qty }) => s + p.price * qty, 0);
+    const tax      = +(subtotal * TAX_RATE).toFixed(2);
+    const total    = +(subtotal + tax).toFixed(2);
 
-    let subtotal = enriched.reduce((s, { product: p, qty }) => s + p.price * qty, 0);
-    const tax    = +(subtotal * 0.08).toFixed(2);
-    const total  = +(subtotal + tax).toFixed(2);
+    // Build Stripe line items — products + tax as a separate line
+    const line_items = [
+      ...enriched.map(({ product: p, qty }) => ({
+        price_data: {
+          currency: (cfg.currency || 'usd').toLowerCase(),
+          product_data: {
+            name: p.name,
+            description: p.description || undefined,
+            images: p.images?.[0] ? [p.images[0]] : undefined,
+          },
+          unit_amount: Math.round(p.price * 100),
+        },
+        quantity: qty,
+      })),
+      // Tax line item
+      {
+        price_data: {
+          currency: (cfg.currency || 'usd').toLowerCase(),
+          product_data: { name: 'Tax (8%)' },
+          unit_amount: Math.round(tax * 100),
+        },
+        quantity: 1,
+      },
+    ];
 
     const order = await Order.create({
       user: req.user.id,
@@ -155,7 +168,7 @@ router.get('/mine', auth, async (req, res) => {
   res.json(orders);
 });
 
-// PUT /api/orders/:id/ship — triggers shipped email
+// PUT /api/orders/:id/ship — mark shipped + send email
 router.put('/:id/ship', auth, async (req, res) => {
   try {
     const { trackingNumber } = req.body;
