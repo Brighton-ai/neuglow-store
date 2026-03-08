@@ -294,25 +294,24 @@
           <div class="product-img">
             ${p.images?.[0]
               ? `<img src="${p.images[0]}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover">`
-              : `<span style="font-size:3rem">${p.icon || '💡'}</span>`}
+              : `<span style="font-size:5rem">${p.icon || '💡'}</span>`}
           </div>
-          <div class="product-info">
-            <div class="product-category" style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#BCA98A;margin-bottom:4px">${p.category || ''}</div>
+          <div class="product-body">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#BCA98A;margin-bottom:6px">${p.category || ''}</div>
             <div class="product-name">${p.name}</div>
             <div class="product-desc">${p.description || ''}</div>
             <div class="product-rating">
-              ${'★'.repeat(Math.round(p.rating || 5))}${'☆'.repeat(5 - Math.round(p.rating || 5))}
-              <span>(${p.reviewCount || 0})</span>
+              <span class="stars">${'★'.repeat(Math.round(p.rating || 5))}${'☆'.repeat(5 - Math.round(p.rating || 5))}</span>
+              <span class="rating-count">(${p.reviewCount || 0})</span>
             </div>
-            <div class="product-price-row">
-              <span class="product-price">$${p.price}</span>
-              ${p.compareAt ? `<span class="product-compare">$${p.compareAt}</span>` : ''}
+            <div class="product-footer">
+              <span class="product-price">$${p.price}${p.compareAt ? ` <span style="text-decoration:line-through;font-size:1rem;color:#BCA98A;font-family:DM Sans,sans-serif">$${p.compareAt}</span>` : ''}</span>
+              <button class="btn-add"
+                onclick="${p.stock > 0 ? `Cart.add(${JSON.stringify(p).replace(/"/g,'&quot;')}); showToast('Added to cart ✓','success')` : 'void(0)'}"
+                ${p.stock === 0 ? 'disabled style="opacity:.5;cursor:not-allowed"' : ''}>
+                ${p.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+              </button>
             </div>
-            <button class="btn-add-cart ${p.stock === 0 ? 'disabled' : ''}"
-              onclick="${p.stock > 0 ? `Cart.add(${JSON.stringify(p).replace(/"/g,'&quot;')}); showToast('Added to cart ✓','success')` : 'void(0)'}"
-              ${p.stock === 0 ? 'disabled' : ''}>
-              ${p.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-            </button>
           </div>
         </div>`).join('');
     } catch(e) {
