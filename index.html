@@ -398,7 +398,7 @@
             <div class="product-footer">
               <span class="product-price">SGD ${p.price.toFixed(2)}${p.compareAt ? ` <span style="text-decoration:line-through;font-size:1rem;color:#BCA98A;font-family:DM Sans,sans-serif">SGD ${p.compareAt.toFixed(2)}</span>` : ''}</span>
               <button class="btn-add"
-                onclick="${p.stock > 0 ? `Cart.add(${JSON.stringify(p).replace(/"/g,'&quot;')}); showToast('Added to cart ✓')` : 'void(0)'}"
+                onclick="${p.stock > 0 ? `Cart.add(${JSON.stringify(p).replace(/"/g,'&quot;')}); renderCartPanel(); showToast('Added to cart ✓')` : 'void(0)}'}"
                 ${p.stock === 0 ? 'disabled style="opacity:.5;cursor:not-allowed"' : ''}>
                 ${p.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
               </button>
