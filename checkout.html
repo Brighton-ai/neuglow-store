@@ -121,10 +121,10 @@
     <h4>Order Summary</h4>
     <div id="mini-items"></div>
     <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
-      <div class="mini-row"><span>Subtotal</span><span id="mini-sub">$0.00</span></div>
-      <div class="mini-row"><span>Tax (8%)</span><span id="mini-tax">$0.00</span></div>
+      <div class="mini-row"><span>Subtotal</span><span id="mini-sub">SGD 0.00</span></div>
+      <div class="mini-row"><span>Tax (8%)</span><span id="mini-tax">SGD 0.00</span></div>
       <div class="mini-row"><span>Shipping</span><span style="color:#27AE60;font-weight:600">Free</span></div>
-      <div class="mini-total"><span>Total</span><span id="mini-total">$0.00</span></div>
+      <div class="mini-total"><span>Total</span><span id="mini-total">SGD 0.00</span></div>
       <p class="tax-note">Tax is included in your Stripe payment total.</p>
     </div>
   </div>
@@ -168,9 +168,9 @@
     const tax   = sub * TAX_RATE;
     const total = sub + tax;
 
-    document.getElementById('mini-sub').textContent   = '$' + sub.toFixed(2);
-    document.getElementById('mini-tax').textContent   = '$' + tax.toFixed(2);
-    document.getElementById('mini-total').textContent = '$' + total.toFixed(2);
+    document.getElementById('mini-sub').textContent   = 'SGD ' + sub.toFixed(2);
+    document.getElementById('mini-tax').textContent   = 'SGD ' + tax.toFixed(2);
+    document.getElementById('mini-total').textContent = 'SGD ' + total.toFixed(2);
   }
 
   function goStep(n) {
