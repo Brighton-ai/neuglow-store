@@ -31,7 +31,7 @@ const StoreConfigSchema = new mongoose.Schema({
   // Store meta
   storeName:    { type: String, default: 'NeuGlow' },
   supportEmail: { type: String, default: '' },
-  currency:     { type: String, default: 'USD' },
+  currency:     { type: String, default: 'SGD' },
 
   // Admin setup done flag
   setupComplete: { type: Boolean, default: false },
