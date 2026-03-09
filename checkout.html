@@ -122,8 +122,8 @@
     <div id="mini-items"></div>
     <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
       <div class="mini-row"><span>Subtotal</span><span id="mini-sub">SGD 0.00</span></div>
-      <div class="mini-row"><span>Tax (8%)</span><span id="mini-tax">SGD 0.00</span></div>
-      <div class="mini-row"><span>Shipping</span><span style="color:#27AE60;font-weight:600">Free</span></div>
+      <div class="mini-row"><span id="mini-tax-label">Tax (8%)</span><span id="mini-tax">SGD 0.00</span></div>
+      <div class="mini-row"><span>Shipping</span><span id="mini-ship" style="color:#27AE60;font-weight:600">Free</span></div>
       <div class="mini-total"><span>Total</span><span id="mini-total">SGD 0.00</span></div>
       <p class="tax-note">Tax is included in your Stripe payment total.</p>
     </div>
@@ -133,8 +133,14 @@
 <div id="toast-container"></div>
 <script src="js/api.js"></script>
 <script>
-  const TAX_RATE = 0.08;
+  let STORE_CFG = { taxRate: 8, shippingFee: 0, freeShippingOver: 0, currency: 'SGD' };
   let shippingAddress = {};
+
+  // Load tax/shipping config from server
+  fetch('/api/config/public').then(r => r.json()).then(cfg => {
+    STORE_CFG = cfg;
+    renderMiniCart();
+  }).catch(() => {});
 
   // Check if returning from Stripe
   const params = new URLSearchParams(window.location.search);
