@@ -5,9 +5,16 @@ const User    = require('../models/User');
 const auth    = require('../middleware/auth');
 const { sendMail, orderConfirmationEmail, adminOrderEmail, orderShippedEmail } = require('../config/mailer');
 
-const TAX_RATE = 0.08;
+function getTaxAndShipping(cfg, subtotal) {
+  const taxRate     = (cfg.taxRate ?? 8) / 100;
+  const shippingFee = cfg.shippingFee ?? 0;
+  const freeOver    = cfg.freeShippingOver ?? 0;
+  const tax         = +(subtotal * taxRate).toFixed(2);
+  const shipping    = (freeOver > 0 && subtotal >= freeOver) ? 0 : shippingFee;
+  return { tax, shipping };
+}
 
-// POST /api/orders  — place an order (non-Stripe fallback)
+// POST /api/orders — place order (non-Stripe fallback)
 router.post('/', auth, async (req, res) => {
   try {
     const { items, shippingAddress, paymentIntent } = req.body;
@@ -28,19 +35,19 @@ router.post('/', auth, async (req, res) => {
       enriched.push({ product: p._id, name: p.name, price: p.price, qty: item.qty });
     }
 
-    const tax   = +(subtotal * TAX_RATE).toFixed(2);
-    const total = +(subtotal + tax).toFixed(2);
+    const cfg = req.app.locals.cfg;
+    const { tax, shipping } = getTaxAndShipping(cfg, subtotal);
+    const total = +(subtotal + tax + shipping).toFixed(2);
 
     const order = await Order.create({
       user: req.user.id,
       items: enriched,
-      subtotal, tax, total,
+      subtotal, tax, shipping, total,
       shippingAddress,
       paymentIntent,
       status: paymentIntent ? 'paid' : 'pending',
     });
 
-    const cfg  = req.app.locals.cfg;
     const user = await User.findById(req.user.id).select('name email');
     if (user) {
       sendMail(cfg, user.email, orderConfirmationEmail(order, user)).catch(() => {});
@@ -53,13 +60,12 @@ router.post('/', auth, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-// POST /api/orders/checkout — create Stripe Checkout Session
+// POST /api/orders/checkout — Stripe Checkout Session
 router.post('/checkout', auth, async (req, res) => {
   try {
     const cfg = req.app.locals.cfg;
-    if (!cfg?.stripeSecretKey) {
+    if (!cfg?.stripeSecretKey)
       return res.status(400).json({ error: 'Stripe is not configured. Please add your keys in Admin → Config.' });
-    }
 
     const stripe = require('stripe')(cfg.stripeSecretKey);
     const { items, shippingAddress } = req.body;
@@ -75,14 +81,15 @@ router.post('/checkout', auth, async (req, res) => {
     }
 
     const subtotal = enriched.reduce((s, { product: p, qty }) => s + p.price * qty, 0);
-    const tax      = +(subtotal * TAX_RATE).toFixed(2);
-    const total    = +(subtotal + tax).toFixed(2);
+    const { tax, shipping } = getTaxAndShipping(cfg, subtotal);
+    const total = +(subtotal + tax + shipping).toFixed(2);
+    const currency = (cfg.currency || 'SGD').toLowerCase();
 
-    // Build Stripe line items — products + tax as a separate line
+    // Build Stripe line items
     const line_items = [
       ...enriched.map(({ product: p, qty }) => ({
         price_data: {
-          currency: (cfg.currency || 'sgd').toLowerCase(),
+          currency,
           product_data: {
             name: p.name,
             description: p.description || undefined,
@@ -92,23 +99,39 @@ router.post('/checkout', auth, async (req, res) => {
         },
         quantity: qty,
       })),
-      // Tax line item
-      {
+    ];
+
+    // Add tax line if tax > 0
+    if (tax > 0) {
+      const taxRate = cfg.taxRate ?? 8;
+      line_items.push({
         price_data: {
-          currency: (cfg.currency || 'sgd').toLowerCase(),
-          product_data: { name: 'Tax (8%)' },
+          currency,
+          product_data: { name: `Tax (${taxRate}%)` },
           unit_amount: Math.round(tax * 100),
         },
         quantity: 1,
-      },
-    ];
+      });
+    }
+
+    // Add shipping line if shipping > 0
+    if (shipping > 0) {
+      line_items.push({
+        price_data: {
+          currency,
+          product_data: { name: 'Shipping' },
+          unit_amount: Math.round(shipping * 100),
+        },
+        quantity: 1,
+      });
+    }
 
     const order = await Order.create({
       user: req.user.id,
       items: enriched.map(({ product: p, qty }) => ({
         product: p._id, name: p.name, price: p.price, qty,
       })),
-      subtotal, tax, total,
+      subtotal, tax, shipping, total,
       shippingAddress,
       status: 'pending',
     });
@@ -120,7 +143,7 @@ router.post('/checkout', auth, async (req, res) => {
       success_url: `${req.protocol}://${req.get('host')}/checkout?success=true&order=${order._id}`,
       cancel_url:  `${req.protocol}://${req.get('host')}/checkout?cancelled=true`,
       metadata: { orderId: order._id.toString(), userId: req.user.id },
-      shipping_address_collection: { allowed_countries: ['US','GB','CA','AU','ZA','KE'] },
+      shipping_address_collection: { allowed_countries: ['US','GB','CA','AU','ZA','KE','SG'] },
     });
 
     res.json({ url: session.url, orderId: order._id });
@@ -130,7 +153,7 @@ router.post('/checkout', auth, async (req, res) => {
   }
 });
 
-// POST /api/orders/webhook — Stripe webhook to mark orders paid + send emails
+// POST /api/orders/webhook
 router.post('/webhook', require('express').raw({ type: 'application/json' }), async (req, res) => {
   let event;
   try { event = JSON.parse(req.body); }
@@ -168,7 +191,7 @@ router.get('/mine', auth, async (req, res) => {
   res.json(orders);
 });
 
-// PUT /api/orders/:id/ship — mark shipped + send email
+// PUT /api/orders/:id/ship
 router.put('/:id/ship', auth, async (req, res) => {
   try {
     const { trackingNumber } = req.body;
