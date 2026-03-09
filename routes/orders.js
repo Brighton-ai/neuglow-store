@@ -82,7 +82,7 @@ router.post('/checkout', auth, async (req, res) => {
     const line_items = [
       ...enriched.map(({ product: p, qty }) => ({
         price_data: {
-          currency: (cfg.currency || 'usd').toLowerCase(),
+          currency: (cfg.currency || 'sgd').toLowerCase(),
           product_data: {
             name: p.name,
             description: p.description || undefined,
@@ -95,7 +95,7 @@ router.post('/checkout', auth, async (req, res) => {
       // Tax line item
       {
         price_data: {
-          currency: (cfg.currency || 'usd').toLowerCase(),
+          currency: (cfg.currency || 'sgd').toLowerCase(),
           product_data: { name: 'Tax (8%)' },
           unit_amount: Math.round(tax * 100),
         },
