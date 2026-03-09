@@ -77,7 +77,7 @@ function productCard(p) {
     : p.badge ? `<div class="product-badge">${p.badge}</div>` : '';
 
   const comparePrice = p.compareAt && p.compareAt > p.price
-    ? `<span style="font-size:.9rem;color:var(--mid);text-decoration:line-through;margin-right:6px">$${p.compareAt.toFixed(2)}</span>`
+    ? `<span style="font-size:.9rem;color:var(--mid);text-decoration:line-through;margin-right:6px">SGD ${p.compareAt.toFixed(2)}</span>`
     : '';
 
   const outOfStock = p.trackStock && p.stock <= 0 && !p.allowBackorder;
@@ -97,7 +97,7 @@ function productCard(p) {
         <div class="product-footer">
           <div class="product-price">
             ${comparePrice}
-            <sup>$</sup>${Math.floor(p.price)}<span style="font-size:1rem">.${(p.price % 1).toFixed(2).slice(2)}</span>
+            SGD ${p.price.toFixed(2)}
           </div>
           ${outOfStock
             ? `<button class="btn-add" disabled style="opacity:.5;cursor:not-allowed">Out of Stock</button>`
@@ -140,7 +140,7 @@ function renderCartPanel() {
       <div class="cart-item-img">${item.icon || '💡'}</div>
       <div class="cart-item-info">
         <div class="cart-item-name">${item.name}</div>
-        <div class="cart-item-price">$${(item.price * item.qty).toFixed(2)}</div>
+        <div class="cart-item-price">SGD ${(item.price * item.qty).toFixed(2)}</div>
         <div class="cart-item-qty">
           <button class="qty-btn" onclick="changeQty('${item._id}', ${item.qty - 1})">−</button>
           <span class="qty-val">${item.qty}</span>
@@ -152,7 +152,7 @@ function renderCartPanel() {
   }).join('');
 
   const totalEl = document.getElementById('cartTotal');
-  if (totalEl) totalEl.textContent = '$' + Cart.total().toFixed(2);
+  if (totalEl) totalEl.textContent = 'SGD ' + Cart.total().toFixed(2);
 }
 
 function changeQty(id, qty) {
