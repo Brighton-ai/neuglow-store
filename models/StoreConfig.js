@@ -1,9 +1,3 @@
-/**
- * models/StoreConfig.js
- * Single document (key: "main") storing all sensitive store configuration.
- * Stripe keys, SMTP credentials, JWT secret — all live here, not in .env.
- */
-
 const mongoose = require('mongoose');
 
 const StoreConfigSchema = new mongoose.Schema({
@@ -17,7 +11,7 @@ const StoreConfigSchema = new mongoose.Schema({
   stripePublishableKey: { type: String, default: '' },
   stripeSecretKey:      { type: String, default: '' },
 
-  // Cloudinary (image uploads)
+  // Cloudinary
   cloudinaryCloud:  { type: String, default: '' },
   cloudinaryPreset: { type: String, default: '' },
 
@@ -33,7 +27,12 @@ const StoreConfigSchema = new mongoose.Schema({
   supportEmail: { type: String, default: '' },
   currency:     { type: String, default: 'SGD' },
 
-  // Admin setup done flag
+  // Tax & Shipping
+  taxRate:          { type: Number, default: 8 },    // percentage e.g. 8 = 8%
+  shippingFee:      { type: Number, default: 0 },    // flat fee, 0 = free
+  freeShippingOver: { type: Number, default: 0 },    // 0 = always charge shipping fee
+
+  // Admin setup
   setupComplete: { type: Boolean, default: false },
 
 }, { timestamps: true });
