@@ -17,28 +17,32 @@
 <link rel="canonical" href="https://neuglow.onrender.com">
 <link rel="stylesheet" href="css/main.css">
 <style>
-  /* Category filter */
-  .category-filter {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 32px;
-    flex-wrap: wrap;
-  }
-  .cat-btn {
-    padding: 8px 22px;
-    border-radius: 30px;
-    border: 1.5px solid var(--border, #e5e0d8);
-    background: white;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .2s;
-    color: #5C3D1E;
-    letter-spacing: 0.04em;
-  }
-  .cat-btn:hover { border-color: #E8520A; color: #E8520A; }
-  .cat-btn.active { background: #E8520A; color: white; border-color: #E8520A; }
-  .products-empty { text-align: center; padding: 60px; color: #BCA98A; font-size: 15px; }
+  .category-filter { display:flex; gap:10px; margin-bottom:32px; flex-wrap:wrap; }
+  .cat-btn { padding:8px 22px; border-radius:30px; border:1.5px solid var(--border,#e5e0d8); background:white; font-size:13px; font-weight:600; cursor:pointer; transition:all .2s; color:#5C3D1E; letter-spacing:0.04em; }
+  .cat-btn:hover { border-color:#E8520A; color:#E8520A; }
+  .cat-btn.active { background:#E8520A; color:white; border-color:#E8520A; }
+  .products-empty { text-align:center; padding:60px; color:#BCA98A; font-size:15px; }
+
+  /* Media section */
+  #media { background: var(--dark); padding: 100px 48px; }
+  .media-header { text-align:center; margin-bottom:56px; }
+  .media-header .section-label { justify-content:center; color:rgba(232,82,10,0.85); }
+  .media-header .section-label::after { background:rgba(232,82,10,0.4); }
+  .media-header .section-title { color:var(--cream); }
+  .media-header .section-desc { color:rgba(248,244,238,0.55); margin:0 auto; }
+  .media-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:28px; max-width:1200px; margin:0 auto; }
+  .media-card { background:rgba(248,244,238,0.05); border:1px solid rgba(248,244,238,0.1); border-radius:20px; overflow:hidden; transition:transform .3s, border-color .3s; }
+  .media-card:hover { transform:translateY(-4px); border-color:var(--orange); }
+  .media-card .video-wrap { position:relative; padding-bottom:56.25%; height:0; overflow:hidden; }
+  .media-card .video-wrap iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:0; }
+  .media-card-body { padding:20px 22px; }
+  .media-card-label { font-size:11px; font-weight:700; color:var(--orange); letter-spacing:.1em; text-transform:uppercase; margin-bottom:8px; }
+  .media-card-title { font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-weight:400; color:var(--cream); line-height:1.4; margin-bottom:8px; }
+  .media-card-source { font-size:.78rem; color:rgba(248,244,238,0.35); }
+  .media-card-link { display:inline-flex; align-items:center; gap:6px; margin-top:12px; font-size:.8rem; font-weight:600; color:var(--orange); text-decoration:none; letter-spacing:.04em; text-transform:uppercase; transition:opacity .2s; }
+  .media-card-link:hover { opacity:.75; }
+  @media (max-width:900px) { .media-grid { grid-template-columns:1fr; } }
+  @media (max-width:600px) { #media { padding:60px 24px; } }
 </style>
 </head>
 <body>
@@ -49,6 +53,7 @@
   <div class="nav-links">
     <a href="#products">Shop</a>
     <a href="#science">Science</a>
+    <a href="#media">Media</a>
     <a href="#faq">FAQ</a>
     <a href="cart.html">Cart</a>
   </div>
@@ -118,15 +123,12 @@
     </div>
     <p class="section-desc" style="max-width:260px;font-size:.88rem;">Premium brain-care lighting for every lifestyle and need.</p>
   </div>
-
-  <!-- Category Filter -->
   <div class="category-filter">
     <button class="cat-btn active" onclick="filterCategory('all', this)">All Products</button>
     <button class="cat-btn" onclick="filterCategory('lamps', this)">💡 Lamps</button>
     <button class="cat-btn" onclick="filterCategory('bundles', this)">📦 Bundles</button>
     <button class="cat-btn" onclick="filterCategory('accessories', this)">🔌 Accessories</button>
   </div>
-
   <div class="products-grid" id="productsGrid"></div>
 </section>
 
@@ -138,8 +140,20 @@
       <h2 class="section-title">Backed by <em>Research</em></h2>
       <p class="section-desc">Professor Li-Huei Tsai of MIT pioneered 40Hz auditory-visual stimulation therapy. A Phase II clinical trial showed remarkable results in 76 Alzheimer's patients over 6 months.</p>
       <div class="research-list">
-        <div class="research-item"><div class="research-num">01</div><div class="research-text"><h4>Alzheimer's Disease</h4><p>Wang et al. (2020) — Journal of Alzheimer's Disease: 40Hz light improved cognitive and memory function while reducing behavioral abnormalities.</p></div></div>
-        <div class="research-item"><div class="research-num">02</div><div class="research-text"><h4>Sleep &amp; Insomnia</h4><p>Chen et al. (2021) — Sleep Medicine: 40Hz therapy improved sleep quality, duration, and reduced daytime fatigue.</p></div></div>
+        <div class="research-item">
+          <div class="research-num">01</div>
+          <div class="research-text">
+            <h4>Alzheimer's Disease</h4>
+            <p>Wang et al. (2020) — <a href="https://content.iospress.com/articles/journal-of-alzheimers-disease/jad200813" target="_blank" rel="noopener" style="color:var(--orange);text-decoration:none;font-weight:600">Journal of Alzheimer's Disease ↗</a>: 40Hz light improved cognitive and memory function while reducing behavioral abnormalities.</p>
+          </div>
+        </div>
+        <div class="research-item">
+          <div class="research-num">02</div>
+          <div class="research-text">
+            <h4>Sleep &amp; Insomnia</h4>
+            <p>Chen et al. (2021) — <a href="https://www.sciencedirect.com/science/article/pii/S1389945721000368" target="_blank" rel="noopener" style="color:var(--orange);text-decoration:none;font-weight:600">Sleep Medicine ↗</a>: 40Hz therapy improved sleep quality, duration, and reduced daytime fatigue.</p>
+          </div>
+        </div>
         <div class="research-item"><div class="research-num">03</div><div class="research-text"><h4>Parkinson's Disease</h4><p>Baltus et al. (2021) — Frontiers in Human Neuroscience: Alleviated motor and cognitive impairments; promoted neural regeneration.</p></div></div>
         <div class="research-item"><div class="research-num">04</div><div class="research-text"><h4>Depression &amp; ADHD</h4><p>Multiple studies report improvements in emotional state, focus, and reduced anxiety symptoms with regular 40Hz exposure.</p></div></div>
       </div>
@@ -156,6 +170,75 @@
         <div class="sci-stat"><div class="sci-stat-num">6mo</div><div class="sci-stat-label">Trial duration</div></div>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ===== MEDIA ===== -->
+<section id="media">
+  <div class="media-header">
+    <div class="section-label">Media</div>
+    <h2 class="section-title" style="color:var(--cream)">Light-Based Therapy <em>in the News</em></h2>
+    <p class="section-desc">Watch leading researchers and clinicians explain the science behind 40Hz light therapy.</p>
+  </div>
+  <div class="media-grid">
+
+    <!-- Video 1 -->
+    <div class="media-card">
+      <div class="video-wrap">
+        <iframe
+          src="https://www.youtube.com/embed/O_p4QWkE2Ls"
+          title="Light-based therapy for Alzheimer's disease"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <div class="media-card-body">
+        <div class="media-card-label">Research</div>
+        <div class="media-card-title">Light-based therapy for Alzheimer's disease</div>
+        <div class="media-card-source">YouTube</div>
+        <a href="https://www.youtube.com/watch?v=O_p4QWkE2Ls" target="_blank" rel="noopener" class="media-card-link">Watch on YouTube ↗</a>
+      </div>
+    </div>
+
+    <!-- Video 2 -->
+    <div class="media-card">
+      <div class="video-wrap">
+        <iframe
+          src="https://www.youtube.com/embed/AS0K0XOMNwA"
+          title="Could We Treat Alzheimer's with Light and Sound? | Li-Huei Tsai | TED"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+      </div>
+      <div class="media-card-body">
+        <div class="media-card-label">TED Talk</div>
+        <div class="media-card-title">Could We Treat Alzheimer's with Light and Sound?</div>
+        <div class="media-card-source">Li-Huei Tsai · TED</div>
+        <a href="https://www.youtube.com/watch?v=AS0K0XOMNwA" target="_blank" rel="noopener" class="media-card-link">Watch on YouTube ↗</a>
+      </div>
+    </div>
+
+    <!-- Video 3 -->
+    <div class="media-card">
+      <div class="video-wrap" style="padding-bottom:56.25%;position:relative;height:0;overflow:hidden;background:#111;display:flex;align-items:center;justify-content:center;">
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;">
+          <div style="font-size:3rem;">🎥</div>
+          <p style="color:rgba(248,244,238,0.6);font-size:.85rem;text-align:center;padding:0 16px">Click below to watch the expert commentary</p>
+          <a href="https://alzheimer.knowledgehub.wiley.com/videos/expert-commentary-with-professor-yuan-han-yang/"
+            target="_blank" rel="noopener"
+            style="background:var(--orange);color:#fff;padding:10px 22px;border-radius:30px;font-size:.82rem;font-weight:700;text-decoration:none;letter-spacing:.04em;text-transform:uppercase;">
+            Watch Video ↗
+          </a>
+        </div>
+      </div>
+      <div class="media-card-body">
+        <div class="media-card-label">Expert Commentary</div>
+        <div class="media-card-title">Prof. Yuan-han Yang — Director, Neuroscience Research Center</div>
+        <div class="media-card-source">Kaohsiung Medical University · Wiley Knowledge Hub</div>
+        <a href="https://alzheimer.knowledgehub.wiley.com/videos/expert-commentary-with-professor-yuan-han-yang/" target="_blank" rel="noopener" class="media-card-link">Watch on Wiley ↗</a>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -207,11 +290,22 @@
     </div>
     <div>
       <div class="footer-col-title">Info</div>
-      <div class="footer-links"><a href="#science">Research</a><a href="#faq">FAQ</a><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
+      <div class="footer-links">
+        <a href="#science">Research</a>
+        <a href="#media">Media</a>
+        <a href="#faq">FAQ</a>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+      </div>
     </div>
     <div>
       <div class="footer-col-title">Support</div>
-      <div class="footer-links"><a href="#">Contact Us</a><a href="cart.html">View Cart</a><a href="#">Warranty</a><a href="account.html">Track Order</a></div>
+      <div class="footer-links">
+        <a href="#">Contact Us</a>
+        <a href="cart.html">View Cart</a>
+        <a href="#">Warranty</a>
+        <a href="account.html">Track Order</a>
+      </div>
     </div>
   </div>
   <div class="footer-bottom">
@@ -231,7 +325,7 @@
   <div class="cart-footer">
     <div class="cart-subtotal">
       <span>Subtotal</span>
-      <span class="cart-subtotal-price" id="cartTotal">$0.00</span>
+      <span class="cart-subtotal-price" id="cartTotal">SGD 0.00</span>
     </div>
     <a href="cart.html" class="btn-full" style="text-align:center;display:block;text-decoration:none;margin-top:8px">View Full Cart &rarr;</a>
     <button class="btn-full" style="margin-top:10px;background:var(--dark)" onclick="goToCheckout()">Checkout →</button>
@@ -266,16 +360,13 @@
 <script src="js/api.js"></script>
 <script src="js/main.js"></script>
 <script>
-  // Category filter
   let currentCategory = 'all';
 
   async function filterCategory(cat, btn) {
     currentCategory = cat;
-    // Update active button
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
     await loadProducts();
-    // Scroll to products
     document.getElementById('products').scrollIntoView({ behavior: 'smooth' });
   }
 
@@ -305,9 +396,9 @@
               <span class="rating-count">(${p.reviewCount || 0})</span>
             </div>
             <div class="product-footer">
-              <span class="product-price">$${p.price}${p.compareAt ? ` <span style="text-decoration:line-through;font-size:1rem;color:#BCA98A;font-family:DM Sans,sans-serif">$${p.compareAt}</span>` : ''}</span>
+              <span class="product-price">SGD ${p.price.toFixed(2)}${p.compareAt ? ` <span style="text-decoration:line-through;font-size:1rem;color:#BCA98A;font-family:DM Sans,sans-serif">SGD ${p.compareAt.toFixed(2)}</span>` : ''}</span>
               <button class="btn-add"
-                onclick="${p.stock > 0 ? `Cart.add(${JSON.stringify(p).replace(/"/g,'&quot;')}); showToast('Added to cart ✓','success')` : 'void(0)'}"
+                onclick="${p.stock > 0 ? `Cart.add(${JSON.stringify(p).replace(/"/g,'&quot;')}); showToast('Added to cart ✓')` : 'void(0)'}"
                 ${p.stock === 0 ? 'disabled style="opacity:.5;cursor:not-allowed"' : ''}>
                 ${p.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
               </button>
@@ -319,7 +410,6 @@
     }
   }
 
-  // Load products on page ready
   document.addEventListener('DOMContentLoaded', loadProducts);
 </script>
 </body>
