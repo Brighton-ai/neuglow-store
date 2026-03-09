@@ -112,4 +112,18 @@ router.post('/setup', async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+
+// GET /api/config/public — returns only tax/shipping info (no secrets, no auth needed)
+router.get('/public', async (req, res) => {
+  try {
+    const cfg = await require('../models/StoreConfig').findOne({ key: 'main' });
+    res.json({
+      taxRate:          cfg?.taxRate ?? 8,
+      shippingFee:      cfg?.shippingFee ?? 0,
+      freeShippingOver: cfg?.freeShippingOver ?? 0,
+      currency:         cfg?.currency ?? 'SGD',
+    });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 module.exports = router;
